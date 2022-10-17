@@ -1,20 +1,20 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import { ExpressPeerServer } from 'peer';
 import { corsController } from './config/cors';
 import { connection } from './config/db';
-import { init } from './config/socket';
+import { ErrorHandling } from './config/error';
+import { RoutesController } from './config/path';
 import { PATHS } from './constants/path';
 
 const app = express();
 
-const server = app.listen(3000);
+const server = app.listen(8000);
+
 
 const peerServer = ExpressPeerServer(server, {
   path: PATHS.PEER_SERVER
 });
 
-init(server);
 
 app.use(express.json());
 
@@ -25,6 +25,12 @@ app.use(express.static(__dirname));
 app.use(corsController);
 
 app.use(PATHS.PEER_SERVER, peerServer);
+
+RoutesController.forEach(({path, controller}) => {
+  app.use(path, controller);
+});
+
+app.use(ErrorHandling);
 
 connection().then(response => {});
 

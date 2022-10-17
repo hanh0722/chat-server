@@ -1,7 +1,9 @@
 {
   "env": {
     "DB_USERNAME": "chat-web",
-    "DB_PASSWORD": "alda2JVShMfHtH9i",
-    "DB_NAME": "chat-web"
+    "DB_PASSWORD": "tJtoAns14fg8bBdz",
+    "DB_NAME": "chat-web",
+    "SENDGRID_API": "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",
+    "SENDER_EMAIL": "AnhNDH.B19CN022@stu.ptit.edu.vn"
   }
 }
