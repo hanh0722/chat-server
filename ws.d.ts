@@ -7,11 +7,13 @@ declare module 'ws' {
   class WebSocket extends WebSocketCore {
     _unsubscribeRoom: Array<Function>;
     id: string;
+
     subscribe: <T = any>(eventName: string, callback: (...args: Array<T>) => void) => void;
     dispatch: <T = any>(eventName: string, ...args: Array<T>) => void;
     join: (roomId: string) => void;
     to: (roomId: string) => undefined | {
       dispatch: <T = any>(eventName: string, ...args: Array<T>) => void;
     }
+    leave: (roomId: string) => void;
   }
 }

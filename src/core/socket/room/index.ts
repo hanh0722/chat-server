@@ -1,10 +1,11 @@
-import { isArray, isFunction, omit } from "lodash";
+import { isArray, isFunction } from "lodash";
 import { WebSocket } from "ws";
 import { Rooms } from "../types";
 
 abstract class RoomController {
   abstract join(client: WebSocket, roomId: string): void
-  abstract leaveAll(client: WebSocket): void
+  abstract leaveAll(client: WebSocket): void;
+  abstract leave(client: WebSocket, roomId: string): void
 }
 
 export class Room extends RoomController {
@@ -57,6 +58,22 @@ export class Room extends RoomController {
     }
   }
 
+  public leave(client: WebSocket, roomId: string): void {
+    if (!(roomId in this.rooms)) {
+      return;
+    }
+    const idxClient = this.rooms[roomId].indexOf(client);
+    if (idxClient === -1) {
+      const index = this.rooms[roomId].findIndex(socket => socket.id === client.id);
+      if (index === -1) {
+        return;
+      }
+      this.rooms[roomId].splice(index, 1);
+    } else {
+      this.rooms[roomId].splice(idxClient, 1);
+    }
+  }
+
   public to(roomId: string, socket: WebSocket) {
     if (!(roomId in this.rooms)) {
       return;
@@ -64,7 +81,9 @@ export class Room extends RoomController {
     const dispatch = <T = any>(eventName: string, ...args: Array<T>) => {
       this.rooms[roomId].forEach(client => {
         if (socket.id !== client.id) {
-          client.dispatch(eventName, ...args);
+          client.dispatch(eventName, ...args, {
+            _client: client
+          } as any);
         }
       })
     }

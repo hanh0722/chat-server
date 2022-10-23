@@ -23,8 +23,8 @@ const socketServer = new Socket({
 
 
 socketServer.connection((socket, request) => {
-  socket.subscribe('message', (a, b, c) => {
-    
+  socket.subscribe('message', (a) => {
+    socket.dispatch('msg', a);
   });
 
   socket.subscribe('join-room', roomId => {
@@ -32,46 +32,13 @@ socketServer.connection((socket, request) => {
   });
 
   socket.subscribe('send-message', (roomId, message) => {
-    socket.to(roomId)?.dispatch('msg-callback', message);
+    socket.to(roomId)?.dispatch('msg-callback', roomId);
+  });
+
+  socket.subscribe('leave-room', roomId => {
+    socket.leave(roomId);
   })
 })
-
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    allowedHeaders: ["Content-Type", "authorization"],
-    credentials: true,
-  },
-});
-
-io.on("connection", (socket) => {
-  // socket.on("join-room", (roomId) => {
-  //   // socket.join(roomId);
-  // });
-
-  socket.on("message", (data) => {
-    console.log(data);
-    socket.to("1").emit("msg", data);
-    socket.emit("data", data);
-  });
-});
-
-// const serverSocket = new Socket({
-//   port: 2207
-// });
-
-// serverSocket.event('connection', (socket, request) => {
-//   socket.subscribe('click', (data) => {
-//     socket.dispatch('listen-click', data);
-//   });
-//   socket.subscribe('join-room', roomId => {
-//     socket.to(roomId);
-//   });
-
-//   socket.subscribe('message-to-room', data => {
-//     // console.log(data);
-//   })
-// })
 
 app.use(express.json());
 
