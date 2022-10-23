@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import User from "../../../model/User";
 import { isContainUpperCase, isPasswordContainSpecialCharacter } from "../../../operator";
 import { getUserByUsername } from "../../../services/user";
 
@@ -29,3 +30,35 @@ export const registerValidator = [
       return true;
     }),
 ];
+
+export const validateUserOTP = [
+  body('otp')
+  .not()
+  .isEmpty()
+  .withMessage('Mã xác thực không được để trống'),
+  body('username')
+  .not()
+  .isEmpty()
+  .withMessage('Username không hợp lệ')
+  .custom(async (username, {req}) => {
+    try{
+      const otp = req.body?.['otp'];
+      const user = await User.findOne({username: username});
+      if (!user) {
+        return Promise.reject('Người dùng không tồn tại trong hệ thống!');
+      }
+
+      const isValidate = user?.is_validate;
+      const otpUser = user?.otp;
+      if (isValidate || !otp || !otpUser) {
+        return Promise.reject(`Người dùng ${username} đã được xác thực!`);
+      }
+      if (otp !== otpUser) {
+        return Promise.reject('Mã xác thực không chính xác!');
+      }
+      return true;
+    }catch(err) {
+      return Promise.reject('Có lỗi xảy ra, xin thử lại sau')
+    }
+  })
+]

@@ -10,7 +10,7 @@ type Routes = Array<Route>;
 
 export const RoutesController: Routes = [
   {
-    path: '/user',
+    path: '/api/user',
     controller: userRoutes
   }
 ]

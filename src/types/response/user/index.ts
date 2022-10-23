@@ -7,3 +7,8 @@ export interface RequestRegister {
 export interface CreateUserParams extends RequestRegister {
 
 }
+
+export interface RequestValidateUser {
+  username: string;
+  otp: string;
+}
