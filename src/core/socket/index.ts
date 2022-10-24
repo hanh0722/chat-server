@@ -57,29 +57,12 @@ export class Socket extends SocketController {
     this.client = socket;
   }
 
-  private listenDispatchMessage(socket: WebSocket) {
-    if (this.event.eventNames().includes("send-message")) {
-      this.event.removeAllListeners("send-message");
-    }
-    this.event.on("send-message", (data) => {
-      const type = data?.eventName;
-      const payload = data?.data;
-      socket.send(
-        sendMessage({
-          type,
-          payload,
-        })
-      );
-    });
-  }
-
 
   private init() {
     this.server.on("connection", (socket, request) => {
       this.client = socket;
       this.addMetaDataToClient(socket);
       this.event.emit("connection", socket, request);
-
       socket.on("message", (data) => {
         this.event.emit("message", socket, data);
       });
@@ -87,7 +70,6 @@ export class Socket extends SocketController {
       socket.on("close", (code, reason) => {
         this.destroy(socket);
       });
-      this.listenDispatchMessage(socket);
     });
   }
 
