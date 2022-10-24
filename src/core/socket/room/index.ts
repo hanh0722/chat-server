@@ -18,6 +18,8 @@ export class Room extends RoomController {
     super();
     this.join = this.join.bind(this);
     this.to = this.to.bind(this);
+    this.leave = this.leave.bind(this);
+    this.leaveAll = this.leaveAll.bind(this);
   }
 
   protected join(client: WebSocket, roomId: string) {

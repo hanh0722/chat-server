@@ -1,0 +1,1 @@
+export const TOKEN_KEY = 'private_token_key__server';

@@ -3,6 +3,17 @@ import User from "../../../model/User";
 import { isContainUpperCase, isPasswordContainSpecialCharacter } from "../../../operator";
 import { getUserByUsername } from "../../../services/user";
 
+export const loginValidator = [
+  body('username')
+  .not()
+  .isEmpty()
+  .withMessage('Username không được để trống'),
+  body('password')
+  .not()
+  .isEmpty()
+  .withMessage('Mật khẩu không được để trống')
+];
+
 export const registerValidator = [
   body("username")
     .not()

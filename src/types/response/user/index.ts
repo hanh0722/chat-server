@@ -4,6 +4,11 @@ export interface RequestRegister {
   email: string;
 }
 
+export interface RequestLogin {
+  username: string;
+  password: string;
+}
+
 export interface CreateUserParams extends RequestRegister {
 
 }

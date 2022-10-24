@@ -1,13 +1,11 @@
 import express from "express";
 import { ExpressPeerServer } from "peer";
-// import { Server } from "ws";
 import { Socket } from "./core/socket";
 import { corsController } from "./config/cors";
 import { connection } from "./config/db";
 import { ErrorHandling } from "./config/error";
 import { RoutesController } from "./config/path";
 import { PATHS } from "./constants/path";
-import { Server } from "socket.io";
 
 const app = express();
 
@@ -37,7 +35,7 @@ socketServer.connection((socket, request) => {
 
   socket.subscribe('leave-room', roomId => {
     socket.leave(roomId);
-  })
+  });
 })
 
 app.use(express.json());
