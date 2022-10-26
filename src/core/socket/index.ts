@@ -1,10 +1,13 @@
 import { IncomingMessage } from "http";
+import cookie from 'cookie';
 import { EventEmitter } from "events";
 import { Data, Server, ServerOptions, WebSocket } from "ws";
 import { SocketController } from "./methods";
 import { v4 } from "uuid";
 import { getMessage, sendMessage } from "./utils/data";
 import { Message, Subscription } from "./types";
+import { Cookie } from "../../utils/cookie";
+import { TOKEN_COOKIE_KEY } from "../../constants/key";
 
 export class Socket extends SocketController {
   private server: Server;
@@ -47,13 +50,15 @@ export class Socket extends SocketController {
     });
   }
 
-  private addMetaDataToClient(socket: WebSocket) {
+  private addMetaDataToClient(socket: WebSocket, request: IncomingMessage) {
+    const token = Cookie.getCookie(request.headers.cookie || '', TOKEN_COOKIE_KEY);
+    socket.token = token;
     socket.id = v4();
     socket.subscribe = this.subscribe;
     socket.dispatch = this.dispatch;
     socket.join = this.joinRoom
     socket.to = this.toRoom;
-    socket.leave = this.leaveRoom
+    socket.leave = this.leaveRoom;
     this.client = socket;
   }
 
@@ -61,7 +66,7 @@ export class Socket extends SocketController {
   private init() {
     this.server.on("connection", (socket, request) => {
       this.client = socket;
-      this.addMetaDataToClient(socket);
+      this.addMetaDataToClient(socket, request);
       this.event.emit("connection", socket, request);
       socket.on("message", (data) => {
         this.event.emit("message", socket, data);

@@ -4,8 +4,9 @@ import { verify } from "jsonwebtoken";
 import { TOKEN_KEY } from "../../constants/key";
 import User, { SchemaUser } from "../../model/User";
 import { ResponseEntity } from "../../response";
-import { createToken, createUser, getUser, getUserById, isMatchPassword } from "../../services/user";
-import { RequestLogin, RequestRegister, RequestValidateUser } from "../../types/response/user";
+import { createToken, createUser, getUser, getUserById, getUserByQuery, isMatchPassword } from "../../services/user";
+import { SORT } from "../../types/base";
+import { RequestLogin, RequestParamsUser, RequestRegister, RequestValidateUser } from "../../types/response/user";
 import { sendMail } from "../../utils/mail";
 import { getFieldDataUser } from "../../utils/user";
 
@@ -109,3 +110,25 @@ export const getInfoUser: RequestHandler<any, ResponseEntity> = async (req, res,
     next(err);
   }
 }
+
+export const searchUserController: RequestHandler<any, ResponseEntity, any, RequestParamsUser> = async (req, res, next) => {
+  try{
+    const { page, page_size , sort, username } = req.query;
+    const data = await getUserByQuery({
+      page,
+      page_size,
+      search: {
+        username: {
+          $regex: username,
+          $options: 'i'
+        }
+      }
+    }, {
+      username: sort || SORT.ASCENDING
+    });
+    res.json(new ResponseEntity(200, 'OK', data));
+  }catch(err) {
+    next(err);
+  }
+}
+

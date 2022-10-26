@@ -7,6 +7,7 @@ import { ErrorHandling } from "./config/error";
 import { RoutesController } from "./config/path";
 import { PATHS } from "./constants/path";
 
+
 const app = express();
 
 const server = app.listen(8000);

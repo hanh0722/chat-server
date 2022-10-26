@@ -15,5 +15,6 @@ declare module 'ws' {
       dispatch: <T = any>(eventName: string, ...args: Array<T>) => void;
     }
     leave: (roomId: string) => void;
+    token?: string | null;
   }
 }
