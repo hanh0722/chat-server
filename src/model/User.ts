@@ -7,6 +7,8 @@ export interface User {
   creation_time: number,
   is_validate?: boolean,
   otp?: number;
+  avatar?: string;
+  description?: string;
 }
 
 export interface SchemaUser extends User, Document {
@@ -39,6 +41,13 @@ const UserSchema = new Schema<SchemaUser>({
   },
   otp: {
     type: Number
+  },
+  avatar: {
+    type: String
+  },
+  description: {
+    type: String,
+    default: 'Xin chào! Tôi đang sử dụng chat PTIT! Hãy cùng nhau trò chuyện nhé'
   }
 }, {
   timestamps: true,

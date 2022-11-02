@@ -20,6 +20,7 @@ export class Room extends RoomController {
     this.to = this.to.bind(this);
     this.leave = this.leave.bind(this);
     this.leaveAll = this.leaveAll.bind(this);
+    
   }
 
   protected join(client: WebSocket, roomId: string) {
@@ -91,10 +92,19 @@ export class Room extends RoomController {
           } as any);
         }
       })
+    };
+
+    const emit = (eventName: string, ...args: Array<any>) => {
+      this.rooms[roomId].forEach(client => {
+        client.dispatch(eventName, ...args, {
+          _client: client
+        });
+      })
     }
 
     return {
-      dispatch
+      dispatch,
+      emit
     }
   }
 }

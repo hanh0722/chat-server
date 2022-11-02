@@ -113,7 +113,7 @@ export const getInfoUser: RequestHandler<any, ResponseEntity> = async (req, res,
 
 export const searchUserController: RequestHandler<any, ResponseEntity, any, RequestParamsUser> = async (req, res, next) => {
   try{
-    const { page, page_size , sort, username } = req.query;
+    const { page, page_size , sort, username, ignore } = req.query;
     const data = await getUserByQuery({
       page,
       page_size,
@@ -121,6 +121,9 @@ export const searchUserController: RequestHandler<any, ResponseEntity, any, Requ
         username: {
           $regex: username,
           $options: 'i'
+        },
+        _id: {
+          $ne: ignore
         }
       }
     }, {

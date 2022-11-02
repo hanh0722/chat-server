@@ -22,4 +22,5 @@ export interface RequestValidateUser {
 
 export interface RequestParamsUser extends QuerySort {
   username: string;
+  ignore: Array<string>;
 }

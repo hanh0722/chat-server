@@ -27,7 +27,6 @@ export const getTokenMiddleware: RequestHandler = (req, res, next) => {
     next();
 
   } catch (err) {
-    console.log(err);
     next();
   }
 };

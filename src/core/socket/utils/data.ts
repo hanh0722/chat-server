@@ -10,5 +10,10 @@ export const getMessage = <T = any>(data: string) => {
 }
 
 export const sendMessage = <T = any>(data: Message<T>) => {
-  return JSON.stringify(data);
+  try{
+    return JSON.stringify(data);
+  }catch(err) {
+    console.log(err);
+    console.log(data);
+  }
 }

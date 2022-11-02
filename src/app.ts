@@ -1,11 +1,12 @@
 import express from "express";
 import { ExpressPeerServer } from "peer";
-import { Socket } from "./core/socket";
 import { corsController } from "./config/cors";
 import { connection } from "./config/db";
 import { ErrorHandling } from "./config/error";
 import { RoutesController } from "./config/path";
 import { PATHS } from "./constants/path";
+import { events } from "./controller/event-socket";
+import { initSocket } from "./socket";
 
 
 const app = express();
@@ -16,28 +17,14 @@ const peerServer = ExpressPeerServer(server, {
   path: PATHS.PEER_SERVER,
 });
 
-const socketServer = new Socket({
-  port: 2207
+initSocket((socket, request) => {
+  events.forEach(({event, listener}) => {
+    socket.subscribe(event, (...args) => {
+      listener(socket, ...args);
+    })
+  })
 });
 
-
-socketServer.connection((socket, request) => {
-  socket.subscribe('message', (a) => {
-    socket.dispatch('msg', a);
-  });
-
-  socket.subscribe('join-room', roomId => {
-    socket.join(roomId);
-  });
-
-  socket.subscribe('send-message', (roomId, message) => {
-    socket.to(roomId)?.dispatch('msg-callback', roomId);
-  });
-
-  socket.subscribe('leave-room', roomId => {
-    socket.leave(roomId);
-  });
-})
 
 app.use(express.json());
 
