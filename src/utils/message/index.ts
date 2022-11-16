@@ -37,20 +37,7 @@ export const getRoomsData = (
       response = omit(response, ["to"]);
     }
   }
-  const firstChat = response.chats?.[0];
-
-  const payload = omit(
-    Object.assign({}, response, {
-      message: {
-        ...firstChat,
-        // @ts-ignore
-        sender: getFieldDataUser(firstChat.sender._doc)
-      }
-    }),
-    ["chats"]
-  );
-
-  return payload;
+  return response;
 };
 
 export const getMessageResponse = (props: RoomSchema & Id) => {
@@ -58,34 +45,24 @@ export const getMessageResponse = (props: RoomSchema & Id) => {
     props?.from,
     props?.to
   );
-  const message = props?.chats?.[0];
-  const response = omit(
-    {
-      ...props,
-      from: sender,
-      to: receiver,
-      message,
-    },
-    ["chats"]
-  );
+  const response = {
+    ...props,
+    from: sender,
+    to: receiver,
+  };
 
   return response;
 };
 
 export const getMessageCreateRoom = (props: RoomSchema & Id) => {
   const { from: sender } = getDataSenderAndReceiver(props?.from, props?.to);
-  const message = props?.chats?.[0];
 
   const response = getMessageResponse(props);
 
-  const messageSocket = omit(
-    {
-      ...props,
-      from: sender,
-      message,
-    },
-    ["chats", "to"]
-  );
+  const messageSocket = {
+    ...props,
+    from: sender,
+  };
 
   return {
     response,

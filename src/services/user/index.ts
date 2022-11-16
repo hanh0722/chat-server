@@ -97,11 +97,11 @@ export const getUserByQuery = async (
   const total = await query.clone().countDocuments();
 
   const searchQuery = await query
-    .skip((page - 1) * page_size)
-    .limit(page_size)
+    .skip((+page - 1) * +page_size)
+    .limit(+page_size)
     .lean();
 
-  const totalPage = Math.floor(total / page);
+  const totalPage = Math.floor(+total / +page);
 
-  return new SortModel(searchQuery, total, totalPage < page, page);
+  return new SortModel(searchQuery, total, totalPage < +page, +page);
 };

@@ -5,6 +5,7 @@ export interface Chat {
   message: string;
   sender: User | Types.ObjectId | string;
   creation_time: number;
+  seen_users?: Array<string | Types.ObjectId | User>
 }
 export interface Room {
   from?: User;
@@ -12,11 +13,17 @@ export interface Room {
   group?: Array<User>;
   creation_time: number;
   chats: Array<Chat>;
-  is_group: boolean
+  is_group: boolean;
+  group_info?: RoomInfo
 }
 
 export interface RoomSchema extends Room, Document {
   _doc: Room
+}
+
+export interface RoomInfo {
+  name_group: string;
+  creator: string
 }
 
 const roomSchema = new Schema<RoomSchema>({
@@ -30,13 +37,23 @@ const roomSchema = new Schema<RoomSchema>({
   },
   group: [
     {
-      type: Types.ObjectId
+      type: Types.ObjectId,
+      ref: 'user'
     }
   ],
   creation_time: {
     type: Number,
     required: true,
     default: Date.now()
+  },
+  group_info: {
+    name_group: {
+      type: String,
+    },
+    creator: {
+      type: Types.ObjectId,
+      ref: 'user'
+    }
   },
   is_group: {
     type: Boolean,
@@ -58,7 +75,13 @@ const roomSchema = new Schema<RoomSchema>({
         type: Number,
         required: true,
         default: Date.now()
-      }
+      },
+      seen_users: [
+        {
+          type: Types.ObjectId,
+          ref: 'user'
+        }
+      ]
     }
   ]
 }, {

@@ -20,25 +20,50 @@ export class Room extends RoomController {
     this.to = this.to.bind(this);
     this.leave = this.leave.bind(this);
     this.leaveAll = this.leaveAll.bind(this);
-    
   }
+
+  
+  public get getRooms() : Rooms {
+    return this.rooms
+  }
+
+  private addRoomToClient(client: WebSocket, roomId: string) {
+    const roomUser = client.joinedRooms;
+    if (!isArray(roomUser)) {
+      client.joinedRooms = [];
+      client.joinedRooms.push(roomId.toString());
+    }
+    
+    if (isArray(client.joinedRooms) && !client.joinedRooms.includes(roomId.toString())) {
+      client.joinedRooms.push(roomId.toString());
+    }
+  } 
 
   protected join(client: WebSocket, roomId: string) {
     if (roomId in this.rooms) {
       const instances = this.rooms[roomId];
+      if (instances.indexOf(client) > -1) {
+        return;
+      }
       if (!isArray(instances)) {
         this.rooms[roomId] = [client];
       } else {
         this.rooms[roomId].push(client);
       }
+      this.addRoomToClient(client, roomId);
     } else {
       this.rooms[roomId] = [client];
+      this.addRoomToClient(client, roomId)
     }
+    
 
     const unsubscribe = () => {
       const clientIndex = this.rooms[roomId].indexOf(client);
       if (clientIndex > -1) {
         this.rooms[roomId].splice(clientIndex, 1);
+        this.rooms[roomId].forEach(client => {
+          client.dispatch('disconnect', client.clientData?._id);
+        })
       }
 
       if (this.rooms[roomId].length === 0) {

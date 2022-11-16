@@ -1,5 +1,7 @@
 import { RequestHandler } from "express";
 import { isEmpty } from "lodash";
+import { Types } from "mongoose";
+import { EVENTS } from "../../../constants/events";
 import Room from "../../../model/Room";
 import { ResponseEntity } from "../../../response";
 import { fetchRooms } from "../../../services/room";
@@ -17,19 +19,23 @@ export const getRoom: RequestHandler<
     if (isEmpty(req?.metaData)) {
       return res.status(403).json(new ResponseEntity(403, "Unauthenticated"));
     }
+    const clientSocket = getSocket();
     const { page = 1, page_size = -1, sort = SORT.DESCENDING } = req.query;
     const userId = req.metaData._id;
-    const username = req.metaData.username;
-
     const payload = await fetchRooms(
       {
         $or: [
           {
-            from: userId,
+            from: new Types.ObjectId(userId),
           },
           {
-            to: userId,
+            to: new Types.ObjectId(userId),
           },
+          {
+            group: {
+              $in: [new Types.ObjectId(userId)]
+            }
+          }
         ],
       },
       req.metaData,
@@ -39,6 +45,17 @@ export const getRoom: RequestHandler<
         sort,
       }
     );
+    const client = clientSocket.getClient;
+    payload?.data?.forEach(room => {
+      const roomId = room?._id;
+      if (roomId) {
+        client?.join(roomId);
+        client?.to(roomId)?.dispatch(EVENTS.USER_ONLINE, {
+          userId,
+          roomId
+        });
+      }
+    })
 
     res.json(new ResponseEntity(200, "OK", payload));
   } catch (err) {

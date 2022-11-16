@@ -5,7 +5,7 @@ import { connection } from "./config/db";
 import { ErrorHandling } from "./config/error";
 import { RoutesController } from "./config/path";
 import { PATHS } from "./constants/path";
-import { events } from "./controller/event-socket";
+import { disconnectSocket, events } from "./controller/event-socket";
 import { initSocket } from "./socket";
 
 
@@ -18,12 +18,13 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 initSocket((socket, request) => {
+  
   events.forEach(({event, listener}) => {
     socket.subscribe(event, (...args) => {
       listener(socket, ...args);
     })
-  })
-});
+  });
+}, disconnectSocket);
 
 
 app.use(express.json());

@@ -56,14 +56,12 @@ export const addChatToRoom = async (props: CreateChatProps) => {
     if (!room) {
       return null;
     }
-    const chat = new Chat(message, sender_id, Date.now());
+    const chat = new Chat(message, sender_id, Date.now(), [new Types.ObjectId(sender_id)]);
 
     const chatData = Object.assign({}, chat, {
       _id: new Types.ObjectId()
     })
     room.chats.push(chatData);
-
-    // await room.save();
 
     const user = await User.findById(sender_id).lean();
 

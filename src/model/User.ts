@@ -9,6 +9,7 @@ export interface User {
   otp?: number;
   avatar?: string;
   description?: string;
+  last_active?: number | string;
 }
 
 export interface SchemaUser extends User, Document {
@@ -48,7 +49,10 @@ const UserSchema = new Schema<SchemaUser>({
   description: {
     type: String,
     default: 'Xin chào! Tôi đang sử dụng chat PTIT! Hãy cùng nhau trò chuyện nhé'
-  }
+  },
+  last_active: {
+    type: Schema.Types.Mixed
+  },
 }, {
   timestamps: true,
 });

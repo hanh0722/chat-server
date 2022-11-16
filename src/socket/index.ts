@@ -1,13 +1,16 @@
 import { WebSocket } from "ws";
-import { isFunction } from 'lodash';
-import { IncomingMessage } from 'http';
+import { isFunction } from "lodash";
+import { IncomingMessage } from "http";
 import { Socket } from "../core/socket";
 
 let io: WebSocket;
 let clientRequest: IncomingMessage;
 let serverSocket: Socket;
 
-export const initSocket = (cb?: (socket: WebSocket, request: IncomingMessage) => void) => {
+export const initSocket = (
+  cb?: (socket: WebSocket, request: IncomingMessage) => void,
+  disconnect?: (socket: WebSocket) => void
+) => {
   const server = new Socket({
     port: 2207,
   });
@@ -18,21 +21,26 @@ export const initSocket = (cb?: (socket: WebSocket, request: IncomingMessage) =>
       cb(socket, request);
     }
     io = socket;
-    clientRequest = request
+    clientRequest = request;
+  });
+
+  server.disconnect((socket) => {
+    if (isFunction(disconnect)) {
+      disconnect(socket);
+    }
   });
 };
 
 export const getSocket = () => {
   if (!io) {
-    throw new Error('You must connect socket before get socket');
-  } 
+    throw new Error("You must connect socket before get socket");
+  }
   return io;
-}
+};
 
 export const getServerSocket = () => {
   if (!serverSocket) {
-    throw new Error('You must connect socket before get socket');
+    throw new Error("You must connect socket before get socket");
   }
   return serverSocket;
-}
-
+};

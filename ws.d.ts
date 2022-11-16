@@ -22,6 +22,7 @@ declare module 'ws' {
     clientData?: TokenMiddleware;
 
     getClient: WebSocket | undefined;
+    joinedRooms?: Array<string>
     
   }
 }

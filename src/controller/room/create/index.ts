@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { Types, ObjectId } from 'mongoose';
 import { validationResult } from "express-validator";
 import { WebSocket } from "ws";
 import { Chat } from "../../../model/Chat";
@@ -36,13 +37,13 @@ export const createRoomChat: RequestHandler<
     const room = new Room({
       from,
       to,
-      chats: [new Chat(message, from)],
+      chats: [new Chat(message, from, Date.now(), [new Types.ObjectId(from)])],
     });
 
     const serverSocket = getServerSocket();
 
     const data = await room.save();
-    const response = await (await data.populate("from")).populate("to");
+    const response = await (await (await data.populate("from")).populate("to")).populate('chats.sender');
     const obj = response.toObject<RoomSchema>();
     const roomId = response._id.toString();
     let clientIgnore: WebSocket | undefined;

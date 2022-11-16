@@ -31,3 +31,10 @@ export const validateCreateRoomChat = [
     }
   })
 ]
+
+export const validateCreateGroupChat = [
+  body('name')
+  .not()
+  .isEmpty()
+  .withMessage('Tên group chat không được để trống')
+]

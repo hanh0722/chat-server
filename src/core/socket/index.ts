@@ -5,7 +5,7 @@ import { Data, Server, ServerOptions, WebSocket } from "ws";
 import { SocketController } from "./methods";
 import { v4 } from "uuid";
 import { getMessage, sendMessage } from "./utils/data";
-import { Message, Subscription } from "./types";
+import { Message, Rooms, Subscription } from "./types";
 import { Cookie } from "../../utils/cookie";
 import { TOKEN_COOKIE_KEY } from "../../constants/key";
 import { TokenMiddleware } from "../../middleware/types";
@@ -35,6 +35,7 @@ export class Socket extends SocketController {
     this.leaveAll(socket);
     socket.close();
     this.client = undefined;
+    this.event.emit('disconnect', socket);
   }
 
   
@@ -75,7 +76,6 @@ export class Socket extends SocketController {
         console.log(err);
       }
     }
-
     socket.clientData = dataClientToken;
     socket.token = token;
     socket.id = v4();
@@ -115,6 +115,10 @@ export class Socket extends SocketController {
     callback: (socket: WebSocket, request: IncomingMessage) => void
   ): void {
     this.event.on("connection", callback);
+  }
+
+  public disconnect(callback: (socket: WebSocket) => void) {
+    this.event.on('disconnect', callback);
   }
 
   public subscribe<T = any>(
